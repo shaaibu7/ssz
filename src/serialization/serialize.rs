@@ -1,5 +1,5 @@
 pub mod serialize {
-    pub fn serialize_unsigned_integer<T>(num: T) -> Vec<String>
+    pub fn serialize_unsigned_integer<T>(num: T) -> Option<Vec<String>>
     where
         T: Into<u128> + Copy,
     {
@@ -14,13 +14,14 @@ pub mod serialize {
             .map(|b| format!("{:02x}", b))
             .collect();
 
-        result.to_vec()
+        Some(result.to_vec())
     }
 
-    pub fn deserialize_unsigned_integer(data: Vec<String>) -> u128 {
-        data.iter()
-            .enumerate()
-            .map(|(i, j)| u128::from_str_radix(j, 16).unwrap() << (8 * i))
-            .sum()
+    pub fn serialize_boolean(data: bool) -> Option<String> {
+        if data {
+            Some(format!("{:02x}", 01))
+        } else {
+            Some(format!("{:02x}", 00))
+        }
     }
 }
