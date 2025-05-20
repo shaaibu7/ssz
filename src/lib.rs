@@ -2,9 +2,13 @@ mod deserialization;
 mod serialization;
 
 use deserialization::deserialize::deserialize::{
-    deserialize_boolean, deserialize_unsigned_integer,
+    deserialize_boolean, deserialize_unsigned_integer, deserialize_vector_of_boolean,
+    deserialize_vector_unsigned_integers,
 };
-use serialization::serialize::serialize::{serialize_boolean, serialize_unsigned_integer};
+use serialization::serialize::serialize::{
+    serialize_boolean, serialize_unsigned_integer, serialize_vector_of_boolean,
+    serialize_vector_of_unsigned_integers,
+};
 
 #[cfg(test)]
 mod tests {
@@ -92,5 +96,91 @@ mod tests {
         let deserialize_result = deserialize_boolean(serialize_data.unwrap());
 
         assert_ne!(deserialize_result.unwrap(), true);
+    }
+
+    #[test]
+    fn serialize_vector_of_unsigned_integers_should_pass_test() {
+        let data: Vec<u16> = vec![256, 512, 768];
+        let byte_array = serialize_vector_of_unsigned_integers(data);
+
+        let result = vec![
+            "00", "01", "00", "00", "00", "00", "00", "00", "00", "02", "00", "00", "00", "00",
+            "00", "00", "00", "03", "00", "00", "00", "00", "00", "00",
+        ];
+        assert_eq!(byte_array.unwrap(), result)
+    }
+
+    #[test]
+    fn serialize_vector_of_unsigned_integers_should_fail_test() {
+        let data: Vec<u16> = vec![256, 512, 768];
+        let byte_array = serialize_vector_of_unsigned_integers(data);
+
+        let result = vec![
+            "000", "01", "00", "00", "00", "00", "00", "00", "00", "02", "00", "00", "00", "00",
+            "00", "00", "00", "03", "00", "00", "00", "00", "00", "00",
+        ];
+        assert_ne!(byte_array.unwrap(), result)
+    }
+
+    #[test]
+    fn serialize_vector_of_boolean_should_pass_test() {
+        let data: Vec<bool> = vec![true, false, true, true];
+        let byte_array = serialize_vector_of_boolean(data);
+
+        let result = vec!["01", "00", "01", "01"];
+        assert_eq!(byte_array.unwrap(), result)
+    }
+
+    #[test]
+    fn serialize_vector_of_boolean_should_fail_test() {
+        let data: Vec<bool> = vec![true, false, true, true];
+        let byte_array = serialize_vector_of_boolean(data);
+
+        let result = vec!["01", "01", "01", "01"];
+        assert_ne!(byte_array.unwrap(), result)
+    }
+
+    #[test]
+    fn deserialize_vector_of_unsigned_integers_should_pass_test() {
+        let data: Vec<u128> = vec![256, 512, 768];
+        let byte_array = serialize_vector_of_unsigned_integers(data.clone());
+
+        let deserialize: Vec<u128> = deserialize_vector_unsigned_integers(byte_array.unwrap()).unwrap();
+
+        
+        assert_eq!(deserialize, data);
+    }
+
+    #[test]
+    fn deserialize_vector_of_unsigned_integers_should_fail_test() {
+        let data: Vec<u128> = vec![256, 512, 768];
+        let byte_array = serialize_vector_of_unsigned_integers(data.clone());
+
+        let deserialize: Vec<u128> = deserialize_vector_unsigned_integers(byte_array.unwrap()).unwrap();
+
+        let data: Vec<u128> = vec![256, 512, 768, 1025];
+        
+        assert_ne!(deserialize, data);
+    }
+
+    #[test]
+    fn deserialize_vector_of_boolean_should_pass_test() {
+        let data: Vec<bool> = vec![true, false, true, true];
+        let byte_array = serialize_vector_of_boolean(data.clone());
+
+        let deserialize = deserialize_vector_of_boolean(byte_array.unwrap());
+
+        assert_eq!(deserialize.unwrap(), data)
+    }
+
+    #[test]
+    fn deserialize_vector_of_boolean_should_fail_test() {
+        let data: Vec<bool> = vec![true, false, true, true];
+        let byte_array = serialize_vector_of_boolean(data.clone());
+
+        let deserialize = deserialize_vector_of_boolean(byte_array.unwrap());
+
+        let data: Vec<bool> = vec![true, false, true, true, false];
+        assert_ne!(deserialize.unwrap(), data)
     }
 }

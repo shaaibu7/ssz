@@ -33,9 +33,10 @@ fn main() {
     // let result = format!("{:02x}", data);
 
     // println!("{result}")
-    // let vect: Vec<u32> = vec![256, 512, 768, 1025];
+    let vect: Vec<u32> = vec![256, 512, 768];
 
-    // let serialize = serialize_vector_of_unsigned_integers(vect);
+    let serialize = serialize_vector_of_unsigned_integers(vect);
+    println!("{serialize:?}")
 
     // let deserialize_vec: Vec<u128> =
     //     deserialize_vector_unsigned_integers(serialize.unwrap()).unwrap();
