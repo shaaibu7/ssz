@@ -14,7 +14,7 @@ mod tests {
     fn serialize_unsigned_integer_test() {
         let result = serialize_unsigned_integer(1025u16);
 
-        let test_data = vec!["01", "04"];
+        let test_data = vec!["01", "04", "00", "00", "00", "00", "00", "00"];
         assert_eq!(result.unwrap(), test_data);
     }
 
@@ -78,7 +78,6 @@ mod tests {
 
         assert_eq!(deserialize_result.unwrap(), false)
     }
-
 
     #[test]
     fn deserialize_boolean_should_fail_test() {

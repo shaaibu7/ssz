@@ -7,7 +7,7 @@ pub mod serialize {
 
         let length_of_data_bytes = std::mem::size_of::<T>();
 
-        let trimmed_size_data = &data_bytes[..length_of_data_bytes];
+        let trimmed_size_data = &data_bytes[..8];
 
         let result: Vec<String> = trimmed_size_data
             .iter()
@@ -23,5 +23,26 @@ pub mod serialize {
         } else {
             Some(format!("{:02x}", 00))
         }
+    }
+
+    pub fn serialize_vector_of_unsigned_integers<T>(data: Vec<T>) -> Option<Vec<String>>
+    where
+        T: Into<u128> + Copy,
+    {
+        let result = data
+            .iter()
+            .flat_map(|item| serialize_unsigned_integer(*item).unwrap())
+            .collect();
+
+        Some(result)
+    }
+
+    pub fn serialize_vector_of_boolean(data: Vec<bool>) -> Option<Vec<String>> {
+        let result = data
+            .iter()
+            .map(|item| serialize_boolean(*item).unwrap())
+            .collect();
+
+        Some(result)
     }
 }

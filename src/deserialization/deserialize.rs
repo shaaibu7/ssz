@@ -18,4 +18,26 @@ pub mod deserialize {
 
         Some(result)
     }
+
+    pub fn deserialize_vector_unsigned_integers<T>(data: Vec<String>) -> Option<Vec<T>>
+    where
+        T: From<u128> + Copy,
+    {
+        let mut result = Vec::new();
+        for chunk in data.chunks(8) {
+            let num = deserialize_unsigned_integer(chunk.into()).unwrap();
+            result.push(T::from(num));
+        }
+
+        Some(result)
+    }
+
+    pub fn deserialize_vector_of_boolean(data: Vec<String>) -> Option<Vec<bool>> {
+        let result = data
+            .iter()
+            .map(|item| deserialize_boolean(item.to_string()).unwrap())
+            .collect();
+
+        Some(result)
+    }
 }
