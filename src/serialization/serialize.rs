@@ -1,4 +1,13 @@
+use crate::custom::types::types::List;
+
 pub mod serialize {
+    use super::*;
+
+    pub trait ListTrait {
+        fn serialize(&mut self) -> Option<Vec<String>>;
+        // fn deserialize(&self) -> Option<Vec<u128>>;
+    }
+
     pub fn serialize_unsigned_integer<T>(num: T) -> Option<Vec<String>>
     where
         T: Into<u128> + Copy,
@@ -44,5 +53,21 @@ pub mod serialize {
             .collect();
 
         Some(result)
+    }
+
+    impl<T> ListTrait for List<T>
+    where
+        T: Into<u128> + Copy,
+    {
+        fn serialize(&mut self) -> Option<Vec<String>> {
+            let result: Vec<String> = self
+                .data
+                .iter()
+                .flat_map(|item| serialize_unsigned_integer(*item).unwrap())
+                .collect();
+
+            self.serialize_data = result.clone();
+            Some(result)
+        }
     }
 }

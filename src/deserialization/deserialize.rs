@@ -1,4 +1,11 @@
+use crate::custom::types::types::List;
+
 pub mod deserialize {
+
+    use super::*;
+    pub trait ListDeserializeTrait {
+        fn deserialize(&self) -> Option<Vec<u128>>;
+    }
     pub fn deserialize_boolean(data: String) -> Option<bool> {
         if data == "01" {
             Some(true)
@@ -39,5 +46,20 @@ pub mod deserialize {
             .collect();
 
         Some(result)
+    }
+
+    impl<T> ListDeserializeTrait for List<T>
+    where
+        T: Into<u128> + Copy,
+    {
+        fn deserialize(&self) -> Option<Vec<u128>> {
+            let mut result: Vec<u128> = Vec::new();
+            for chunk in self.serialize_data.chunks(8) {
+                let num = deserialize_unsigned_integer(chunk.into()).unwrap();
+                result.push(num);
+            }
+
+            Some(result)
+        }
     }
 }
