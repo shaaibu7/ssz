@@ -1,10 +1,14 @@
-use crate::custom::types::types::List;
+use crate::custom::types::types::{BitVector, List};
 
 pub mod deserialize {
 
     use super::*;
     pub trait ListDeserializeTrait {
         fn deserialize(&self) -> Option<Vec<u128>>;
+    }
+
+    pub trait BitVectorTraitDeserialize {
+        fn deserialize(&self) -> Option<u64>;
     }
     pub fn deserialize_boolean(data: String) -> Option<bool> {
         if data == "01" {
@@ -60,6 +64,24 @@ pub mod deserialize {
             }
 
             Some(result)
+        }
+    }
+
+    impl BitVectorTraitDeserialize for BitVector {
+        fn deserialize(&self) -> Option<u64> {
+            let data = &self.serialize;
+            let length: usize = self.length.into();
+
+            let transform_data: Vec<String> = data
+                .iter()
+                .map(|item| format!("{:b}", u8::from_str_radix(item, 16).unwrap()))
+                .collect();
+
+            let concat_data = transform_data.join("");
+            let return_data = &concat_data[..length];
+
+
+            Some(u64::from_str_radix(return_data, 2).unwrap())
         }
     }
 }

@@ -1,11 +1,14 @@
-use crate::custom::types::types::List;
+use crate::custom::types::types::{BitVector, List};
 
 pub mod serialize {
     use super::*;
 
     pub trait ListTrait {
         fn serialize(&mut self) -> Option<Vec<String>>;
-        // fn deserialize(&self) -> Option<Vec<u128>>;
+    }
+
+    pub trait BitVectorTrait {
+        fn serialize(&mut self) -> Option<Vec<String>>;
     }
 
     pub fn serialize_unsigned_integer<T>(num: T) -> Option<Vec<String>>
@@ -67,6 +70,42 @@ pub mod serialize {
                 .collect();
 
             self.serialize_data = result.clone();
+            Some(result)
+        }
+    }
+
+    fn padding_bits(data: u64) -> String {
+        let mut binary = format!("{}", data);
+        let pad_value = binary.len() % 8;
+
+        if pad_value != 0 {
+            let padding = 8 - pad_value;
+            binary.extend(std::iter::repeat('0').take(padding));
+        }
+
+        binary
+    }
+
+    impl BitVectorTrait for BitVector {
+        fn serialize(&mut self) -> Option<Vec<String>> {
+            let mut data: String = self.data.to_string();
+
+            if self.data.to_string().len() % 8 != 0 {
+                data = padding_bits(self.data);
+            }
+
+            let result: Vec<String> = data
+                .as_bytes()
+                .chunks(8)
+                .map(|chunk| {
+                    let chunk_str = std::str::from_utf8(chunk).unwrap();
+
+                    let num = u8::from_str_radix(chunk_str, 2).unwrap();
+
+                    format!("{:02x}", num)
+                })
+                .collect();
+            self.serialize = result.clone();
             Some(result)
         }
     }

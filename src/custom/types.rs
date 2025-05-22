@@ -4,4 +4,10 @@ pub mod types {
         pub data: Vec<T>,
         pub serialize_data: Vec<String>,
     }
+
+    pub struct BitVector {
+        pub length: u16,
+        pub data: u64,
+        pub serialize: Vec<String>,
+    }
 }
