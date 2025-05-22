@@ -80,7 +80,6 @@ pub mod deserialize {
             let concat_data = transform_data.join("");
             let return_data = &concat_data[..length];
 
-
             Some(u64::from_str_radix(return_data, 2).unwrap())
         }
     }
