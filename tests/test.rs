@@ -1,11 +1,11 @@
-use ssz::custom::types::types::List;
+use ssz::custom::types::types::{List, BitVector};
 use ssz::deserialization::deserialize::deserialize::{
     ListDeserializeTrait, deserialize_boolean, deserialize_unsigned_integer,
-    deserialize_vector_of_boolean, deserialize_vector_unsigned_integers,
+    deserialize_vector_of_boolean, deserialize_vector_unsigned_integers, BitVectorTraitDeserialize
 };
 use ssz::serialization::serialize::serialize::{
     ListTrait, serialize_boolean, serialize_unsigned_integer, serialize_vector_of_boolean,
-    serialize_vector_of_unsigned_integers,
+    serialize_vector_of_unsigned_integers, BitVectorTrait
 };
 
 #[cfg(test)]
@@ -248,5 +248,51 @@ mod tests {
 
         let mock_data: Vec<u128> = vec![1024, 2048, 3073];
         assert_ne!(deserialize.unwrap(), mock_data);
+    }
+
+    #[test]
+    fn serialize_bit_vector_should_pass_test() {
+        let mut data = BitVector { length: 10, data: 1011010010, serialize: Vec::new() };
+
+        let serialize_data = data.serialize();
+        let result = vec!["b4", "80"];
+
+        assert_eq!(serialize_data.unwrap(), result);
+
+    }
+
+    #[test]
+    fn serialize_bit_vector_should_fail_test() {
+        let mut data = BitVector { length: 10, data: 1011010010, serialize: Vec::new() };
+
+        let serialize_data = data.serialize();
+        let result = vec!["B4", "80"];
+
+        assert_ne!(serialize_data.unwrap(), result);
+
+    }
+
+    #[test]
+    fn deserialize_bit_vector_should_pass_test() {
+        let mut data = BitVector { length: 10, data: 1011010010, serialize: Vec::new() };
+
+        let serialize_data = data.serialize();
+        let deserialize_data = data.deserialize();
+
+        assert_eq!(format!("{:b}", deserialize_data.unwrap()), "1011010010");
+        assert_eq!(deserialize_data.unwrap(), 722); // 722 is 1011010010 in decimal
+
+    }
+
+    #[test]
+    fn deserialize_bit_vector_should_fail_test() {
+        let mut data = BitVector { length: 10, data: 1011010010, serialize: Vec::new() };
+
+        let serialize_data = data.serialize();
+        let deserialize_data = data.deserialize();
+
+        assert_ne!(format!("{:b}", deserialize_data.unwrap()), "10110100100");
+        assert_ne!(deserialize_data.unwrap(), 723);
+
     }
 }
